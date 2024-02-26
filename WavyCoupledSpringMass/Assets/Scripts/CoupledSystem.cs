@@ -51,7 +51,7 @@ public class CoupledSystem : MonoBehaviour
         Vector3 systemDirection = vectorAlongSystem.normalized;
 
         // Divide the entire span. The restlength is the size of each division
-        float offset = vectorAlongSystem.magnitude / (amountOfBodies + 2);
+        float offset = vectorAlongSystem.magnitude / (amountOfBodies + 1);
 
         float restLengthFactor = 0.5f; // Lower value means more tension 
 

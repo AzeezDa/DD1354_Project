@@ -667,11 +667,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amountOfBodies: 40
-  omegaSquared: 10000
-  gamma: 1
-  drivingForceAmplitude: 1
+  omegaSquared: 100
+  gamma: 0.5
+  drivingForceAmplitude: 5
   drivingForceFrequency: 1
-  gravitionalAcceleration: 9.81
+  gravitionalAcceleration: 0
   bodyPrefab: {fileID: 2189214525100946926, guid: d05c88f316a3c9e43b2815cac6c32cf8,
     type: 3}
   springPrefab: {fileID: 7832927782961393496, guid: 011e85f65811d5a48adbda131f387bad,

@@ -31,25 +31,25 @@
 
         <article>
             <h3>Update 0 - In Unity There Is Strength</h3>
-            <h6>25th of February 2022</h6>
+            <h6>25th of February 2024</h6>
 
             <p>
                 Welcome to my project blog in the DD1354 Models and Simulation course. My name is Azeez Daoud and I
-                am here to invite you to venture with me in world of <b>WAVES!</b>. It is a world full of
+                am here to invite you to venture with me in world of <b>WAVES!</b>. There we will encounter
                 differential equations, numerical analysis, and a whole lot of springs and masses. Together we will
                 build a system of coupled springs and masses, shake it (<b>A LOT!</b>) to produce two
                 types of waves: transverse and longitudinal waves. The former propagates through the medium by
                 displacing it perpendicularly in the direction of its motion. The latter displaces the medium in the
-                direction of motion. This might seem quite abstract, so here is an image showing the two types:
+                direction of motion. This might seem quite abstract, so here is a figure showing the two types:
             </p>
 
             <figure class="center bordered">
                 <img src="Blog/Update0/waves.png"
                     alt="An image of transverse and longitudinal waves moving through a spring">
                 <figcaption>
-                    Image from
+                    A person shaking a spring producing transverse and longitudinal waves. Image from
                     <a href="https://upload.wikimedia.org/wikipedia/commons/0/08/CNX_UPhysics_16_01_GirlWave.png"
-                        target="_blank">wikimedia.org</a>
+                        target="_blank">wikimedia.org</a>.
                 </figcaption>
             </figure>
 
@@ -73,16 +73,16 @@
                 <img src="Blog/Update0/coupled_spring_mass.png"
                     alt="An image of transverse and longitudinal waves moving through a spring">
                 <figcaption>
-                    Image from
+                    A coupled spring-mass system. Image from
                     <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Coupled_Harmonic_Oscillator_k.svg/640px-Coupled_Harmonic_Oscillator_k.svg.png"
-                        target="_blank">wikimedia.org</a>
+                        target="_blank">wikimedia.org</a>.
                 </figcaption>
             </figure>
 
 
             <p>
 
-                This is called a coupled spring-mass system which I will abbreviate as <abbr
+                This is called a coupled spring-mass system which we will abbreviate as <abbr
                     title="Coupled Spring-Mass System">CSMS</abbr>, but more on that later. First we need to set up a
                 few things in Unity:
 
@@ -93,20 +93,19 @@
             </ol>
 
             Masses and walls are fairly easy to set up. Masses will be just an cube with coordinates for position and
-            velocity (we can actually omit the mass for a reason that will become clear soon). And walls will also be a
+            velocity (we can actually omit the mass for a reason that will become clear soon). Walls will also be a
             cube stretched and compressed to look like plane. We will also create a point on that wall where we can
             attach things to it. The most difficult of the three is springs, because they can stretch and compress. How
             should we achieve that in Unity? Simply we will attach a script to a cylinder that stores two coordinates
             (Transforms in Unity-lingo) it can attach to. Based on the vector between those objects we will stretch,
-            move and orient
-            that cylinder based on that vector. In the inspector it looks like this
+            move and orient that cylinder based on that vector. In the inspector it looks like this
             </p>
 
             <figure class="center bordered">
                 <img src="Blog/Update0/unity_spring_fields.png"
                     alt="An image of of a coupled spring-mass system as a chain of three springs and two masses">
                 <figcaption>
-                    A coupled spring-mass system
+                    Unity fields for setting the connection points of a spring.
                 </figcaption>
             </figure>
 
@@ -117,26 +116,195 @@
 
 
             <figure class="center bordered">
-                <video width="80%" , height="auto" controls>
-                    <source src="Blog/Update0/spring.mp4" type="video/mp4">
-                </video>
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/Iwt6dKgRRMI?si=1YNvBj25eockP65u"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
             </figure>
 
             <p>
                 <b>IT WORKS!</b> What next? Well let us set up a scene where we can do our little experiment. Just
-                two walls, a floor and some light adjustments should work (we'll maybe make more
+                two walls, a floor and some light adjustments should work (we'll maybe make it more
                 beautiful later on).
             </p>
 
             <figure class="center bordered">
                 <img src="Blog/Update0/unity_scenery.png"
-                    alt="An image of the senary in the Unity Editor as two walls and a floor">
+                    alt="An image of the scenery in the Unity Editor as two walls and a floor">
                 <figcaption>
                     The scenery of the experiment in Unity Editor
                 </figcaption>
             </figure>
 
-            In the next update we will get our hands dirty with some physics and numerical integrators!
+            Alright the stage is set! In the next update we will get our hands dirty with some physics and numerical
+            integrators!
+        </article>
+
+        <article>
+            <h3>Update 1 - Let There Be Waves</h3>
+            <h6>26th of February 2024</h6>
+
+            <p>
+                Welcome back! Today's update will be filled with mathematics and physics but the results will hopefully
+                be
+                satisfying! Let us begin by creating a <abbr title="Coupled Spring-Mass System">CSMS</abbr>. We create
+                an object which we will use to generate the CSMS and handle the physics for it. We give it the number of
+                masses and it subdivides the vector between the walls into small parts in which we will place masses.
+                Between two masses (or wall and mass) we put a spring whose connection points are the masses. The
+                results
+                look like this:
+            </p>
+            <figure class="center bordered">
+                <img src="Blog/Update1/csms_generated.png" alt="An image of the unity">
+                <figcaption>
+                    The CSMS generated in the Unity Editor
+                </figcaption>
+            </figure>
+
+            <p>
+                Alright, now it is time to add some forces on this CSMS. Take any mass at coordinates given by \(X_i =
+                (x_i, y_i, z_i)^T\) and with mass \(m\) (to avoid confusion I will use 'mass' for the physical property,
+                and 'body' for the object that is a <em>mass</em>) in the system it will experience a number of forces:
+            <ul>
+                <li>
+                    <b>Gravitational Force</b>, given as \(F = -mg\hat{y}\) where \(\hat{y} = (0, 1, 0)^T\), or in other
+                    words
+                    a force pointing downwards (in Unity The y-axis in the up-down axis, so we will use that convention
+                    here too), which is equal to the mass of the object times the gravitational acceleration which on
+                    Earth is \(g \approx 9.81 ms^{-2}\).
+                </li>
+                <li>
+                    <b>Spring Forces</b>, given by <a href="https://en.wikipedia.org/wiki/Hooke%27s_law">Hooke's Law</a>
+                    as \(F_\text{spring} = -k\left[(\lVert\Delta X_{i, i-1}\rVert - R)\frac{\Delta X_{i,
+                    i-1}}{\lVert\Delta X_{i, i-1}\rVert} + (\lVert\Delta X_{i, i+1}\rVert - R)\frac{\Delta X_{i,
+                    i+1}}{\lVert\Delta X_{i, i+1}\rVert}\right]\), where \(\Delta X_{i,j} = X_i - X_j\), \(k\) is the
+                    spring constant and \(R\) is the rest length of the spring. The expression is combined the spring
+                    forces from the springs from both sides of the body. From now on we will reduce the large expression
+                    inside the square brackets to just \(\Delta X_i\).
+                </li>
+                <li>
+                    <b>Damping Forces</b>, given as \(F_\text{damping} = -\gamma \dot{X}_i\), where \(\gamma\) is the
+                    damping factor and \(\dot{X}_i\) is the velocity (first derivative with respect to time) of the
+                    body.
+                </li>
+                <li>
+                    <b>Driving Force</b>, given as \(F_\text{driving} = F_0\cos(\omega_d t)\hat{y}\), which is
+                    essentially a force that is given by a sinusoidal oscillation with amplitude \(F_0\) and angular
+                    frequency \(\omega_d\). For now the driving force is in the \(\hat{y}\)-direction. We can actually
+                    add this in different directions by making \(F_0\) a vector of amplitudes and multiplying by
+                    different cosine functions with different frequencies, and even phases in each axis. We will do
+                    that later on.
+                </li>
+            </ul>
+
+            How do we combine all these forces? The answer is <a
+                href="https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion?#Second_law">Newton's Second Law of
+                Motion</a>:
+
+            \[F_\text{total} = m\ddot{X}_i\]
+
+            or in other words: the total force on a body is equal to its mass times its acceleration. So, what we get is
+            the following:
+            \begin{align*}
+            F_\text{total} &= F_\text{gravity} + F_\text{spring} + F_\text{damping} + F_\text{driving} = \\
+            m\ddot{X}_i &= -mg\hat{y} -k\Delta X_i - \gamma\dot{X}_i + F_0\cos(\omega_d t)\hat{y}= \\
+            \ddot{X}_i &= -g\hat{y} - \frac{k}{m}\Delta X_i - \frac{\gamma}{m}\dot{X}_i + \frac{F_0}{m}\cos(\omega_d
+            t)\hat{y}
+            \end{align*}
+
+            If we make each body have the same mass then we can forget about the mass and give the parameters to the
+            simulation as values <em>normalised</em> by the mass. So the equation reduces to:
+
+            \[
+            \ddot{X}_i = -g\hat{y} - \omega^2\Delta X_i - \Gamma\dot{X}_i + \Lambda\cos(\omega_d t)\hat{y}
+            \]
+
+            (the reason the factor in front of \(\Delta X_i\) is \(\omega^2\) is due to solving the equation of motion
+            of the harmonic oscillator analytically and getting \(\omega = \sqrt{\frac{k}{m}}\) as the natural frequency
+            in the solution, so we will use that here too)
+            </p>
+
+            <p>
+                'Alright, alright,' you may say. 'A non-homogenous second order differential equation‽ How will we solve
+                that?' Good question! We must delve in the world of Numerical Analysis and ask for the assistance of the
+                numerical integrators. We could use <a href="https://en.wikipedia.org/wiki/Euler_method">Euler's Forward
+                    Method</a> but that is not stable enough (yes, it sends everything to everywhere in seconds). How
+                about the famous Runge-Kutta methods? And more specifically, Runge-Kutta 4? Yes, that works! I won't go
+                to the details of how the Runge-Kutta methods works, so I refer to the <a
+                    href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">Wikipedia page</a> and the book
+                <em>Numerical Analysis</em> by Timothy Sauer.
+            </p>
+
+            <p>
+                So, we start with that static CSMS, and for every body we do a single Runge-Kutta 4 iteration once each
+                update (FixedUpdate in Unity with fixedDeltaTime set to 0.005s in order to make the calculations easy
+                (fixed increments) and stable (small increments)). We do, however, only add the driving force
+                \(F_\text{driving}\) so the first (leftmost) body, and we will see how the wave propagates. Let us see
+                the results for the following parameters:
+
+            <ul>
+                <li>\(g = 0\) (we want to show the effects of oscillation for now)</li>
+                <li>\(\omega^2 = 100\)</li>
+                <li>\(\Gamma = 0.5\)</li>
+                <li>\(\Lambda = 5\) </li>
+                <li>\(\omega_d = 1\)</li>
+            </ul>
+            </p>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/MITmsFfUQVE?si=rJe8SEPLMK_I7T1Z"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+            <p>
+                <b>THERE! THERE!</b> Do you see that? It is the <b>TRANSVERSE WAVES</b> &#x1f973;! Alright alright, how
+                about
+                some gravity?
+                Let us make
+            <ul>
+                <li>\(g=9.81\)</li>
+                <li>\(\omega^2 = 10000\) (otherwise gravity wins over the spring forces)</li>
+                <li>\(\Gamma = 1\) (for the same reason as above, and since gravity will increase the velocity by a lot
+                    quickly, so we need to <em>damp it down</em>)</li>
+            </ul>
+
+            Let us also start with \(\Lambda = 0\) to let gravity do its work in the beginning. Thereafter, we will make
+            \(\Lambda = 500\). We will also start with \(\omega_d = 1\) then increment it by 1 thrice and notice
+            some interesting wave-pattern emerging.
+            </p>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/N9OCVyoR-uc?si=UsjlC4wA4duUJxtt"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+            <p>
+                Oh! The wave are <em>standing</em> still in their place rather than propagate forward, and every time we
+                increment the integer values of the frequency the number of <em>peaks</em> (called antinodes) seem to
+                increase by one... interesting &#x1F914;. Anyway, whew! Our mathematical model worked pretty
+                well! So as the famous (maybe not so famous) saying goes:
+            </p>
+            <blockquote>
+                "The Math is Mathing! The Physics is Physicsing!"
+                <footer>
+                    <cite>- Anonymous Mathematics & Physics Enjoyer</cite>
+                </footer>
+            </blockquote>
+
+            For the next time, we will look into longitudinal waves by generalising our driving force to be in any of the
+            \(\hat{x}, \hat{y}\) or \(\hat{z}\) direction.
+
+            <h4>Sources</h4>
+            <ul>
+                <li><em>The Physics of Waves</em> by Georgi Howard</li>
+                <li><em>Numerical Analysis</em> by Timothy Sauer</li>
+                <li><a href="https://en.wikipedia.org/wiki/Hooke%27s_law"><em>Hooke's Law</em></a> by Wikipedia Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion?"><em>Newton's Laws of Motion</em></a> by Wikipedia Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Euler_method"><em>Euler's Method</em></a> by Wikipedia Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods"><em>Runge-Kutta Methods</em></a> by Wikipedia Contributors</li>
+            </ul>
         </article>
     </main>
 </body>
