@@ -15,12 +15,12 @@
 
     <style>
         .center {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 50%;
+            text-align: center;
+        }
+
+        .bordered {
             margin-top: 1em;
-            margin-bottom: 1em
+            margin-bottom: 1em;
         }
     </style>
 </head>
@@ -29,21 +29,22 @@
     <main class="container">
         <h1>DD1354 Project Blog</h1>
 
-
         <article>
-            <h3>Session 1 - In Unity There Is Strength</h3>
+            <h3>Update 0 - In Unity There Is Strength</h3>
             <h6>25th of February 2022</h6>
 
-            Welcome to my project blog in the DD1354 Models and Simulation course. My name is Azeez Daoud and I am here
-            to invite you to venture with me in world of <b>WAVES!</b>. It is a world full of differential equations,
-            numerical analysis, and a whole lot of springs and masses. Together we will build a assemble a system of
-            coupled springs and masses, shake the living out of it to produce two types of waves: transverse and
-            longitudinal waves. The former propagates through the medium by displacing it perpendicularly in the
-            direction of its motion. The latter displaces the medium in the direction of motion. This might seem quite
-            abstract, so here is an image showing the two types:
+            <p>
+                Welcome to my project blog in the DD1354 Models and Simulation course. My name is Azeez Daoud and I
+                am here to invite you to venture with me in world of <b>WAVES!</b>. It is a world full of
+                differential equations, numerical analysis, and a whole lot of springs and masses. Together we will
+                build a system of coupled springs and masses, shake it (<b>A LOT!</b>) to produce two
+                types of waves: transverse and longitudinal waves. The former propagates through the medium by
+                displacing it perpendicularly in the direction of its motion. The latter displaces the medium in the
+                direction of motion. This might seem quite abstract, so here is an image showing the two types:
+            </p>
 
-            <figure class="center">
-                <img src="Blog/Session1/waves.png"
+            <figure class="center bordered">
+                <img src="Blog/Update0/waves.png"
                     alt="An image of transverse and longitudinal waves moving through a spring">
                 <figcaption>
                     Image from
@@ -52,18 +53,91 @@
                 </figcaption>
             </figure>
 
-            How do we visualise that? Well, we need 3 ingredients:
+            <p>
+
+                How do we visualise that? Well, we need 3 ingredients:
             <ol>
                 <li>Physics</li>
                 <li>Numerical Analysis</li>
                 <li>Somewhere to do the simulation</li>
-            </ol> 
+            </ol>
 
-            Let us focus on the third point first by choosing a tool to do our simulation. I have decided to use <a href="https://unity.com/">The Unity Game Engine</a>, because it is easy to use and gives very good results with as little of the nitty-gritty of setting up the code for graphical display.
+            Let us focus on the third point first by choosing a tool to do our simulation. I have decided to use <a
+                href="https://unity.com/">The Unity Game Engine</a>, because it is easy set up and use. The medium
+            we are going to make waves propagate through will be a rope-like object modelled as a chain of springs
+            and masses, like in the following figure.
+            </p>
 
+
+            <figure class="center bordered">
+                <img src="Blog/Update0/coupled_spring_mass.png"
+                    alt="An image of transverse and longitudinal waves moving through a spring">
+                <figcaption>
+                    Image from
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Coupled_Harmonic_Oscillator_k.svg/640px-Coupled_Harmonic_Oscillator_k.svg.png"
+                        target="_blank">wikimedia.org</a>
+                </figcaption>
+            </figure>
+
+
+            <p>
+
+                This is called a coupled spring-mass system which I will abbreviate as <abbr
+                    title="Coupled Spring-Mass System">CSMS</abbr>, but more on that later. First we need to set up a
+                few things in Unity:
+
+            <ol>
+                <li>Springs</li>
+                <li>Masses</li>
+                <li>Walls</li>
+            </ol>
+
+            Masses and walls are fairly easy to set up. Masses will be just an cube with coordinates for position and
+            velocity (we can actually omit the mass for a reason that will become clear soon). And walls will also be a
+            cube stretched and compressed to look like plane. We will also create a point on that wall where we can
+            attach things to it. The most difficult of the three is springs, because they can stretch and compress. How
+            should we achieve that in Unity? Simply we will attach a script to a cylinder that stores two coordinates
+            (Transforms in Unity-lingo) it can attach to. Based on the vector between those objects we will stretch,
+            move and orient
+            that cylinder based on that vector. In the inspector it looks like this
+            </p>
+
+            <figure class="center bordered">
+                <img src="Blog/Update0/unity_spring_fields.png"
+                    alt="An image of of a coupled spring-mass system as a chain of three springs and two masses">
+                <figcaption>
+                    A coupled spring-mass system
+                </figcaption>
+            </figure>
+
+            <p>
+                Let's add a couple of cube that move up and down and attach their Transforms to the spring to test that
+                our stretchiness works.
+            </p>
+
+
+            <figure class="center bordered">
+                <video width="80%" , height="auto" controls>
+                    <source src="Blog/Update0/spring.mp4" type="video/mp4">
+                </video>
+            </figure>
+
+            <p>
+                <b>IT WORKS!</b> What next? Well let us set up a scene where we can do our little experiment. Just
+                two walls, a floor and some light adjustments should work (we'll maybe make more
+                beautiful later on).
+            </p>
+
+            <figure class="center bordered">
+                <img src="Blog/Update0/unity_scenery.png"
+                    alt="An image of the senary in the Unity Editor as two walls and a floor">
+                <figcaption>
+                    The scenery of the experiment in Unity Editor
+                </figcaption>
+            </figure>
+
+            In the next update we will get our hands dirty with some physics and numerical integrators!
         </article>
-
-
     </main>
 </body>
 
