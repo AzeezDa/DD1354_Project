@@ -2,9 +2,27 @@ using UnityEngine;
 
 public class CoupledSystem : MonoBehaviour
 {
+
+    [Header("System Information")]
+    [SerializeField]
+    Body bodyPrefab;
+
+    [SerializeField]
+    Spring springPrefab;
+
     [SerializeField]
     [Min(2)]
     int amountOfBodies = 10;
+
+    [SerializeField]
+    Transform startPoint;
+
+    [SerializeField]
+    Transform endPoint;
+
+    [Header("Physical Properties")]
+    [SerializeField]
+    float gravitionalAcceleration = 9.81f;
 
     [SerializeField]
     [Min(0)]
@@ -14,26 +32,32 @@ public class CoupledSystem : MonoBehaviour
     [Min(0)]
     float gamma = 1f;
 
+    [Header("Driving Force in X Direction")]
     [SerializeField]
-    float drivingForceAmplitude = 1f;
+    [Min(0)]
+    float xDrivingAmplitude = 0f;
 
     [SerializeField]
-    float drivingForceFrequency = 1f;
+    [Min(0)]
+    float xDrivingAngularFrequency = 0f;
+
+    [Header("Driving Force in Y Direction")]
+    [SerializeField]
+    [Min(0)]
+    float yDrivingAmplitude = 0f;
 
     [SerializeField]
-    float gravitionalAcceleration = 9.81f;
+    [Min(0)]
+    float yDrivingAngularFrequency = 0f;
+
+    [Header("Driving Force in Z Direction")]
+    [SerializeField]
+    [Min(0)]
+    float zDrivingAmplitude = 0f;
 
     [SerializeField]
-    Body bodyPrefab;
-
-    [SerializeField]
-    Spring springPrefab;
-
-    [SerializeField]
-    Transform startPoint;
-
-    [SerializeField]
-    Transform endPoint;
+    [Min(0)]
+    float zDrivingAngularFrequency = 0f;
 
     float restLength;
     Body[] bodies;
@@ -55,7 +79,7 @@ public class CoupledSystem : MonoBehaviour
 
         float restLengthFactor = 0.5f; // Lower value means more tension 
 
-        restLength = restLengthFactor * offset; 
+        restLength = restLengthFactor * offset;
 
         Vector3 bodiesStartPosition = startPoint.position + systemDirection * offset;
 
@@ -150,11 +174,16 @@ public class CoupledSystem : MonoBehaviour
         acceleration += -gamma * velocity;
 
         // Driving Force (Only on the first body)
-        const float PI2 = 2f * Mathf.PI;
         if (i == 0)
         {
-            float oscillation = Mathf.Cos(PI2 * drivingForceFrequency * (Time.fixedTime + dt));
-            acceleration += drivingForceAmplitude * oscillation * Vector3.up;
+            float oscillationX = Mathf.Cos(xDrivingAngularFrequency * (Time.fixedTime + dt));
+            acceleration += xDrivingAmplitude * oscillationX * Vector3.left;
+
+            float oscillationY = Mathf.Cos(yDrivingAngularFrequency * (Time.fixedTime + dt));
+            acceleration += yDrivingAmplitude * oscillationY * Vector3.up;
+
+            float oscillationZ = Mathf.Cos(zDrivingAngularFrequency * (Time.fixedTime + dt));
+            acceleration += zDrivingAmplitude * oscillationZ * Vector3.forward;
         }
 
         return acceleration;
