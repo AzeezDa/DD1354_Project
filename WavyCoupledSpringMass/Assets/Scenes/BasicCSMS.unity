@@ -309,6 +309,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &193503167 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9001821489556576772, guid: 648c9f1aa2db5054fb8822af8e2d872b,
+    type: 3}
+  m_PrefabInstance: {fileID: 61790924}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24f828dab6ca29c4292895d0eb47962e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,12 +575,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &910329961 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8040462442900905327, guid: 648c9f1aa2db5054fb8822af8e2d872b,
+--- !u!114 &884916067 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9001821489556576772, guid: 648c9f1aa2db5054fb8822af8e2d872b,
     type: 3}
   m_PrefabInstance: {fileID: 1650102541}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24f828dab6ca29c4292895d0eb47962e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1650102541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -671,15 +689,15 @@ MonoBehaviour:
   springPrefab: {fileID: 7832927782961393496, guid: 011e85f65811d5a48adbda131f387bad,
     type: 3}
   amountOfBodies: 40
-  startPoint: {fileID: 910329961}
-  endPoint: {fileID: 1971372086}
+  startPoint: {fileID: 884916067}
+  endPoint: {fileID: 193503167}
   gravitionalAcceleration: 0
   omegaSquared: 10000
-  gamma: 1
-  xDrivingAmplitude: 500
-  xDrivingAngularFrequency: 15
-  yDrivingAmplitude: 0
-  yDrivingAngularFrequency: 0
+  gamma: 0.5
+  xDrivingAmplitude: 0
+  xDrivingAngularFrequency: 0
+  yDrivingAmplitude: 500
+  yDrivingAngularFrequency: 18.84956
   zDrivingAmplitude: 0
   zDrivingAngularFrequency: 0
 --- !u!4 &1782055151
@@ -697,12 +715,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1971372086 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8040462442900905327, guid: 648c9f1aa2db5054fb8822af8e2d872b,
-    type: 3}
-  m_PrefabInstance: {fileID: 61790924}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
