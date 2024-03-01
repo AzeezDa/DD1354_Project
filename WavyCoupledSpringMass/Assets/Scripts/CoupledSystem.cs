@@ -1,9 +1,14 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
+enum DynamicsType
+{
+    ForceBasedDynamics,
+    PositionBasedDynamics
+}
+
 public class CoupledSystem : MonoBehaviour
 {
-
     [Header("System Information")]
     [SerializeField]
     Body bodyPrefab;
@@ -21,19 +26,13 @@ public class CoupledSystem : MonoBehaviour
     [SerializeField]
     Wall endPoint;
 
-    [Header("Physical Properties")]
+    [SerializeField]
+    DynamicsType dynamicsType = DynamicsType.ForceBasedDynamics;
+
+    [Header("General Physical Properties")]
     [SerializeField]
     float gravitionalAcceleration = 9.81f;
 
-    [SerializeField]
-    [Min(0)]
-    float omegaSquared = 1f;
-
-    [SerializeField]
-    [Min(0)]
-    float dampingFactor = 1f;
-
-    [Header("Driving Force in Y Direction")]
     [SerializeField]
     [Min(0)]
     float yDrivingAmplitude = 0f;
@@ -42,11 +41,26 @@ public class CoupledSystem : MonoBehaviour
     [Min(0)]
     float yDrivingAngularFrequency = 0f;
 
+    [SerializeField]
+    [Min(0)]
+    float dampingFactor = 1f;
+
+    [Header("FBD Specific Parameters")]
+    [SerializeField]
+    [Min(0)]
+    float omegaSquared = 1f;
+
+    [Header("PBD Specific Parameters")]
+    [SerializeField]
+    [Min(0)]
+    float springStiffness = 1f;
+
     float restLength;
     Body[] bodies;
     Spring[] springs;
 
     ForceBasedDynamics forceBasedDynamics;
+    PositionBasedDynamics positionBasedDynamics;
 
     // Start is called before the first frame update
     void Start()
@@ -94,12 +108,32 @@ public class CoupledSystem : MonoBehaviour
             yDrivingAngularFrequency,
             restLength,
             bodies);
+
+        positionBasedDynamics = new PositionBasedDynamics(
+            bodies,
+            amountOfBodies,
+            springStiffness,
+            restLength,
+            dampingFactor,
+            gravitionalAcceleration,
+            yDrivingAmplitude,
+            yDrivingAngularFrequency);
     }
 
     void FixedUpdate()
     {
-        forceBasedDynamics.UpdateParameters(gravitionalAcceleration, omegaSquared, dampingFactor, yDrivingAmplitude, yDrivingAngularFrequency);
-        forceBasedDynamics.Step();
+        if (dynamicsType == DynamicsType.ForceBasedDynamics)
+        {
+            forceBasedDynamics.UpdateParameters(gravitionalAcceleration, omegaSquared, dampingFactor, yDrivingAmplitude, yDrivingAngularFrequency);
+            forceBasedDynamics.Step();
+
+        }
+        else if (dynamicsType == DynamicsType.PositionBasedDynamics)
+        {
+
+            positionBasedDynamics.UpdateParameters(gravitionalAcceleration, springStiffness, dampingFactor, yDrivingAmplitude, yDrivingAngularFrequency);
+            positionBasedDynamics.Step();
+        }
     }
 
 }

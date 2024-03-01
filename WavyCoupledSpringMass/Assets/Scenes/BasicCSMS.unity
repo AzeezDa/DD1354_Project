@@ -691,15 +691,13 @@ MonoBehaviour:
   amountOfBodies: 40
   startPoint: {fileID: 884916067}
   endPoint: {fileID: 193503167}
+  dynamicsType: 1
   gravitionalAcceleration: 0
-  omegaSquared: 10000
-  gamma: 0.5
-  xDrivingAmplitude: 0
-  xDrivingAngularFrequency: 0
-  yDrivingAmplitude: 500
-  yDrivingAngularFrequency: 18.84956
-  zDrivingAmplitude: 0
-  zDrivingAngularFrequency: 0
+  yDrivingAmplitude: 10
+  yDrivingAngularFrequency: 6
+  dampingFactor: 1
+  omegaSquared: 100
+  springStiffness: 1
 --- !u!4 &1782055151
 Transform:
   m_ObjectHideFlags: 0
