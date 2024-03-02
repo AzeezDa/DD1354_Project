@@ -330,37 +330,37 @@
                 decided to drop the longitudinal wave visualisation part of the project and focus only on transverse
                 waves. Instead, I will compare the model we discussed in the previous update, which I will henceforth
                 call the <em>Force Based Dynamics</em> model abbreviated as <abbr
-                    title="Force Based Dynamics">FBD</abbr>, with a model called Position Based Dynamics or <abbr
-                    title="Position Based Dynamics">PBD</abbr>. This model will be based on the paper <em><a
+                    title="Force Based Dynamics">FBD</abbr>, with a model called Position Based Dynamics shorted to
+                <abbr title="Position Based Dynamics">PBD</abbr>. This model will be based on the paper <em><a
                         href="https://matthias-research.github.io/pages/publications/posBasedDyn.pdf">Position Based
                         Dynamics</a></em> by Müller, M. et al. with some inspiration from the paper <em><a
                         href="http://graphics.berkeley.edu/papers/Liu-FSM-2013-11/Liu-FSM-2013-11.pdf">Fast Simulation
                         of Mass-Spring Systems</a></em> by Liu, T. et al. regarding damping. So in this update I will
-                tell present how PBD will be implemented in this project and show some results using the same scenery in
+                present how PBD will be implemented in this project and show some results using the same context of
                 the videos in the previous update. So let us get started!
             </p>
 
             <p>
-                PBD uses two components: vertices and constraints. Without going into deep mathematics here, a vertex is
+                PBD uses two components: vertices and constraints. Without going deep into mathematics here, a vertex is
                 like a body; it has a position \(X\), a velocity \(\dot{X}\), and mass \(m\), whilst a constraint is
                 simple a rule we apply on the positions of a number of vertices. In our case the constraints will only
                 be applied to pairs of vertices, and these constraints will be very similar to Hookean spring forces.
                 They have the form \(C(X_i, X_j) = \kappa(\lVert X_i - X_j\rVert - R\)), where \(R\) is the <em>rest
-                    length</em> of the spring, and \(\kappa \in [0, 1]\) is a <em>spring stiffness</em>-like factor.
-                Using some multivariable calculus we can achieve the optimal change, which can be seen in step 4 of the
-                algorithm below. In every step in the simulation we estimate the next position of the vertices, then
-                apply the constraints to optimise the estimations. The optimised position estimations become the
-                vertices' new positions. In summary here is the steps of the algorithm in very high language: after we
-                initialise the
-                \(n\) vertices, we do the following at each step in the simulation:
+                    length</em> of the spring, and \(\kappa \in [0, 1]\) is a <em>spring stiffness</em>-like factor. In
+                every step in the simulation we estimate the next position of the vertices, then apply the constraints
+                to optimise the estimations. The way we change these estimations uses some multivariable calculus, but
+                the final form of the change be seen in step 4 of the algorithm below. The optimised position
+                estimations become the vertices' new positions. In summary here is the steps of the algorithm in very
+                high language: after we initialise the \(n\) vertices, we do the following at each step in the
+                simulation:
             <ol>
                 <li>Update the velocities \(\dot{X}_i\) of vertices \(i=1,2,\ldots,n\) using external forces
                     (gravitational and driving forces)</li>
                 <li>Damp the velocities using \(\dot{X}_i \gets \alpha \dot{X}_i\) for some \(\alpha \in [0, 1]\)</li>
                 <li>Estimate the positions as \(\tilde{X}_i = X_i + \Delta t \dot{X}_i\)</li>
-                <li>For vertices \(i\) and \(i+1\) add \(\Delta \tilde{X}_i = -\frac{\kappa}{2}C(\tilde{X}_i,
-                    \tilde{X}_{i+1})\frac{\tilde{X}_i - \tilde{X}_{i+1}}{\lVert\tilde{X}_i - \tilde{X}_{i+1}\rVert}\) to
-                    \(\tilde{X}_i\) and \(\Delta \tilde{X}_{i+1} = -\Delta \tilde{X}_i\) to \(\tilde{X}_{i+1}\), for \(i
+                <li>For vertices \(j\) and \(j+1\) add \(\Delta \tilde{X}_j = -\frac{\kappa}{2}C(\tilde{X}_j,
+                    \tilde{X}_{j+1})\frac{\tilde{X}_j - \tilde{X}_{j+1}}{\lVert\tilde{X}_j - \tilde{X}_{j+1}\rVert}\) to
+                    \(\tilde{X}_j\) and \(\Delta \tilde{X}_{j+1} = -\Delta \tilde{X}_j\) to \(\tilde{X}_{j+1}\), for \(j
                     = 1,2,\ldots,n-1\)</li>
                 <li>Update the vertices thusly: \(\dot{X}_i \gets (\tilde{X}_i - X_i)/\Delta t\) and \(X_i \gets
                     \tilde{X_i}\)</li>
@@ -370,8 +370,8 @@
             in step 5. You may have noticed that positions are the main focus of this algorithm. Forces are only used if
             they are external and are solely used to update the velocity. The rest of the algorithm only uses the
             positions to update the velocities and position forward in time. You may have also noticed that even though
-            vertices by definition use mass but our algorithm has no mass in it. This is due to the fact that the if we
-            assume all the masses are the same, just like previously, then the masses simply cancel out giving us a
+            vertices by definition use mass, our algorithm does not. This is due to the fact that the if we
+            assume all the masses are the same and, just like previously, the masses simply cancel out giving us a
             massless algorithm. Pretty cool!</p>
 
             <p>
