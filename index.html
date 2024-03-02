@@ -293,19 +293,124 @@
                 </footer>
             </blockquote>
 
-            For the next time, we will look into longitudinal waves by generalising our driving force to be in any of the
+            For the next time, we will look into longitudinal waves by generalising our driving force to be in any of
+            the
             \(\hat{x}, \hat{y}\) or \(\hat{z}\) direction.
 
             <h4>Sources</h4>
             <ul>
                 <li><em>The Physics of Waves</em> by Georgi Howard</li>
                 <li><em>Numerical Analysis</em> by Timothy Sauer</li>
-                <li><a href="https://en.wikipedia.org/wiki/Hooke%27s_law"><em>Hooke's Law</em></a> by Wikipedia Contributors</li>
-                <li><a href="https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion?"><em>Newton's Laws of Motion</em></a> by Wikipedia Contributors</li>
-                <li><a href="https://en.wikipedia.org/wiki/Euler_method"><em>Euler's Method</em></a> by Wikipedia Contributors</li>
-                <li><a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods"><em>Runge-Kutta Methods</em></a> by Wikipedia Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Hooke%27s_law"><em>Hooke's Law</em></a> by Wikipedia
+                    Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion?"><em>Newton's Laws of
+                            Motion</em></a> by Wikipedia Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Euler_method"><em>Euler's Method</em></a> by Wikipedia
+                    Contributors</li>
+                <li><a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods"><em>Runge-Kutta Methods</em></a>
+                    by Wikipedia Contributors</li>
             </ul>
         </article>
+
+
+        <article>
+            <h3>Update 2 - An Slight Turn of Events</h3>
+            <h6>2nd of March 2024</h6>
+            <blockquote>
+                There is nothing permanent except change
+                <footer>
+                    <cite>- Heraclitus</cite>
+                </footer>
+            </blockquote>
+
+            <p>
+                Well well well, there has been a slight turn of events. I presented my idea and prototypes to the course
+                examiner, and the feedback I got was that in order to get a high grade (hopefully A) I must add a focus
+                on a research-based topic. I am aiming for a high grade and have thus changed my plans slightly. I
+                decided to drop the longitudinal wave visualisation part of the project and focus only on transverse
+                waves. Instead, I will compare the model we discussed in the previous update, which I will henceforth
+                call the <em>Force Based Dynamics</em> model abbreviated as <abbr
+                    title="Force Based Dynamics">FBD</abbr>, with a model called Position Based Dynamics or <abbr
+                    title="Position Based Dynamics">PBD</abbr>. This model will be based on the paper <em><a
+                        href="https://matthias-research.github.io/pages/publications/posBasedDyn.pdf">Position Based
+                        Dynamics</a></em> by Müller, M. et al. with some inspiration from the paper <em><a
+                        href="http://graphics.berkeley.edu/papers/Liu-FSM-2013-11/Liu-FSM-2013-11.pdf">Fast Simulation
+                        of Mass-Spring Systems</a></em> by Liu, T. et al. regarding damping. So in this update I will
+                tell present how PBD will be implemented in this project and show some results using the same scenery in
+                the videos in the previous update. So let us get started!
+            </p>
+
+            <p>
+                PBD uses two components: vertices and constraints. Without going into deep mathematics here, a vertex is
+                like a body; it has a position \(X\), a velocity \(\dot{X}\), and mass \(m\), whilst a constraint is
+                simple a rule we apply on the positions of a number of vertices. In our case the constraints will only
+                be applied to pairs of vertices, and these constraints will be very similar to Hookean spring forces.
+                They have the form \(C(X_i, X_j) = \kappa(\lVert X_i - X_j\rVert - R\)), where \(R\) is the <em>rest
+                    length</em> of the spring, and \(\kappa \in [0, 1]\) is a <em>spring stiffness</em>-like factor.
+                Using some multivariable calculus we can achieve the optimal change, which can be seen in step 4 of the
+                algorithm below. In every step in the simulation we estimate the next position of the vertices, then
+                apply the constraints to optimise the estimations. The optimised position estimations become the
+                vertices' new positions. In summary here is the steps of the algorithm in very high language: after we
+                initialise the
+                \(n\) vertices, we do the following at each step in the simulation:
+            <ol>
+                <li>Update the velocities \(\dot{X}_i\) of vertices \(i=1,2,\ldots,n\) using external forces
+                    (gravitational and driving forces)</li>
+                <li>Damp the velocities using \(\dot{X}_i \gets \alpha \dot{X}_i\) for some \(\alpha \in [0, 1]\)</li>
+                <li>Estimate the positions as \(\tilde{X}_i = X_i + \Delta t \dot{X}_i\)</li>
+                <li>For vertices \(i\) and \(i+1\) add \(\Delta \tilde{X}_i = -\frac{\kappa}{2}C(\tilde{X}_i,
+                    \tilde{X}_{i+1})\frac{\tilde{X}_i - \tilde{X}_{i+1}}{\lVert\tilde{X}_i - \tilde{X}_{i+1}\rVert}\) to
+                    \(\tilde{X}_i\) and \(\Delta \tilde{X}_{i+1} = -\Delta \tilde{X}_i\) to \(\tilde{X}_{i+1}\), for \(i
+                    = 1,2,\ldots,n-1\)</li>
+                <li>Update the vertices thusly: \(\dot{X}_i \gets (\tilde{X}_i - X_i)/\Delta t\) and \(X_i \gets
+                    \tilde{X_i}\)</li>
+            </ol>
+
+            If we are using immovable walls, then we treat them as vertices in step 4 but don't update their positions
+            in step 5. You may have noticed that positions are the main focus of this algorithm. Forces are only used if
+            they are external and are solely used to update the velocity. The rest of the algorithm only uses the
+            positions to update the velocities and position forward in time. You may have also noticed that even though
+            vertices by definition use mass but our algorithm has no mass in it. This is due to the fact that the if we
+            assume all the masses are the same, just like previously, then the masses simply cancel out giving us a
+            massless algorithm. Pretty cool!</p>
+
+            <p>
+                Alright now, how does this look like in Unity? First let us clean things up. We will separate the FBD
+                code into its own class, and create a new class for the PBD. In the <abbr
+                    title="Coupled Spring-Mass System">CSMS</abbr> let us make it possible to choose between FBD and PBD
+                in order to make our comparison later. Now let us see the results! First up is the simulation of
+                transverse waves without gravity.
+            </p>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/APWlAl8FnnI?si=JvB7rWMf7vhxnoy5"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+
+            <p>
+                It seems to work pretty well! It is a bit janky sometimes but overall it is very realistic! Let us add
+                some gravity (add more spring stiffness, and driving force amplitude for the same reason as before).
+                Here is what that looks like
+            </p>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/p8qkjtipsuM?si=KHx7wyRbWoZLgF7Z"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+
+            <p>
+                Yeah... the start was a bit <em>interesting</em> but overall the simulation looked very realistic!
+                Things are looking good for the PBD model! Awesome &#x1F60E;!
+            </p>
+
+            <p>
+                In the next update, I will try to compare the two models and perhaps optimise the models further if
+                possible. See you later!
+            </p>
     </main>
 </body>
 

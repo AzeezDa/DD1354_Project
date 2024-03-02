@@ -41,19 +41,25 @@ public class CoupledSystem : MonoBehaviour
     [Min(0)]
     float yDrivingAngularFrequency = 0f;
 
-    [SerializeField]
-    [Min(0)]
-    float dampingFactor = 1f;
 
     [Header("FBD Specific Parameters")]
     [SerializeField]
     [Min(0)]
     float omegaSquared = 1f;
 
-    [Header("PBD Specific Parameters")]
     [SerializeField]
     [Min(0)]
+    float gamma = 1f;
+
+    [Header("PBD Specific Parameters")]
+    [SerializeField]
+    [Range(0, 1)]
     float springStiffness = 1f;
+
+    [SerializeField]
+    [Range(0, 1)]
+    float dampingFactor = 1f;
+
 
     float restLength;
     Body[] bodies;
@@ -103,7 +109,7 @@ public class CoupledSystem : MonoBehaviour
             amountOfBodies,
             gravitionalAcceleration,
             omegaSquared,
-            dampingFactor,
+            gamma,
             yDrivingAmplitude,
             yDrivingAngularFrequency,
             restLength,
@@ -124,7 +130,7 @@ public class CoupledSystem : MonoBehaviour
     {
         if (dynamicsType == DynamicsType.ForceBasedDynamics)
         {
-            forceBasedDynamics.UpdateParameters(gravitionalAcceleration, omegaSquared, dampingFactor, yDrivingAmplitude, yDrivingAngularFrequency);
+            forceBasedDynamics.UpdateParameters(gravitionalAcceleration, omegaSquared, gamma, yDrivingAmplitude, yDrivingAngularFrequency);
             forceBasedDynamics.Step();
 
         }

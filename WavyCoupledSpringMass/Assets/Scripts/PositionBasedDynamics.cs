@@ -5,11 +5,11 @@ using UnityEngine.Assertions;
 
 public class PositionBasedDynamics
 {
-    Body[] bodies;
-    int amountOfBodies;
-    Vector3[] estimatedPositions;
+    readonly Body[] bodies;
+    readonly int amountOfBodies;
+    readonly Vector3[] estimatedPositions;
     float springStiffness;
-    float restLength;
+    readonly float restLength;
     float dampingFactor;
     float gravitionalAcceleration;
     float yDrivingAmplitude;
@@ -87,7 +87,7 @@ public class PositionBasedDynamics
             }
         }
 
-        for (int i = 1; i < amountOfBodies; i++)
+        for (int i = 1; i < amountOfBodies + 1; i++)
         {
             Body body = bodies[i];
 
