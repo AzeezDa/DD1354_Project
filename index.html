@@ -411,6 +411,102 @@
                 In the next update, I will try to compare the two models and perhaps optimise the models further if
                 possible. See you later!
             </p>
+        </article>
+
+        <article>
+            <h3>Update 3 - Four Comparisons and a Mistake</h3>
+            <h6>9th of March 2024</h6>
+            <p>
+                Hello again! Long time no see! I have been working on the report quite a lot recently and also gathered
+                some data to compare the <abbr title="Force-Based Dynamics">FBD</abbr> and <abbr
+                    title="Position-Based Dynamics">PBD</abbr> models. I have also noticed a small mistake in my
+                Runge-Kutta 4 iteration which significantly changed the motion of the <abbr
+                    title="Coupled Spring-Mass System">CSMS</abbr> you saw in the videos from the previous updates.
+            </p>
+
+            <p>
+                Let me start by describing the, very silly &#x1F605;, mistake. In the FBD, every iteration one should
+                use the positions and velocities from the previous step to calculate the new positions and
+                velocities then after the calculations are done the positions and velocities are updated. See the code
+                below for the correct way to do this.
+            </p>
+
+            <code style="white-space: pre-wrap;">
+for b in bodies {
+    do Runge-Kutta 4 step for b
+    store new position and velocity in new_p, new_v
+}
+for b in bodies {
+    b.position = new_p
+    b.velocity = new_v
+}
+            </code>
+
+            <p>
+                Instead of updating at the end, I updated the positions and velocity immediately after calculation
+                like so
+            </p>
+
+            <code style="white-space: pre-wrap;">
+for b in bodies {
+    do Runge-Kutta 4 step for b
+    store new position and velocity in new_p, new_v
+    b.position = new_p
+    b.velocity = new_v
+}
+            </code>
+
+            <p>
+                And since the next body uses the previous body for spring calculation the position of the previous body
+                have already changed and the forces become unbalanced creating a more 'ropey' effect. The new and more
+                correct FBD simulations look like this now.
+            </p>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/MznIZKPulSA?si=kClwG_W7QQOZPr1f"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+
+            <figure class="center bordered">
+                <iframe width="80%" height="400" src="https://www.youtube.com/embed/XL78FgudVTI?si=DNmQ_L9_Xx-48sPW"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </figure>
+            <p>
+                Very less ropey and more stiff-springy, especially in the gravity version where I increased the
+                \(\omega^2\) to avoid the spring breaking.
+            </p>
+
+            <p>
+                Now, on to do some comparisons. I did a brief study of the motion of both models in the report but I
+                will not do that here because well, you can see the motion in the videos. I will instead show a small
+                performance analysis I did. I ran each models with 50, 100, 250, 500, 750, 1000, 1500, 2000, and 3000
+                bodies/vertices then measured the time it took to call the step method. This was done classically by
+                storing the time before the call then measuring the difference after the call finished. The results are
+                in the plot below.
+            </p>
+
+            <figure class="center bordered">
+                <img src="Blog/Update3/model_iteration_time.png"
+                    alt="A plot of the time-cost per step per number bodies for the FBD and PBD models">
+                <figcaption>
+                    A plot of the time-cost per step per number bodies for the FBD and PBD models
+                </figcaption>
+            </figure>
+
+            <p>
+                As you can see, PBD is a lot faster because it does one 'motion calculation' per step whereas the FBD with Runge-Kutta 4 does four. Therefore we see that the time differs by around a factor of four.
+            </p>
+
+            <p>
+                That is it for today. I will probably do another update with the final demonstration and some conclusive
+                thoughts. Until next time &#x1F44B;!
+            </p>
+
+        </article>
     </main>
 </body>
 

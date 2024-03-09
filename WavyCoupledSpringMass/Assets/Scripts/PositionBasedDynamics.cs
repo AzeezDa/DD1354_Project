@@ -58,32 +58,17 @@ public class PositionBasedDynamics
             Body body1 = bodies[i];
             Body body2 = bodies[i + 1];
 
-            Vector3 bodyToBodyVector;
-
-            if (i == 0)
-            {
-                bodyToBodyVector = bodies[0].Position - body2.Position;
-            }
-            else if (i == amountOfBodies)
-            {
-                bodyToBodyVector = body1.Position - bodies[amountOfBodies + 1].Position;
-            }
-            else
-            {
-                bodyToBodyVector = body1.Position - body2.Position;
-            }
-
+            Vector3 bodyToBodyVector = body1.Position - body2.Position;
             float bodyToBodyDistance = bodyToBodyVector.magnitude;
 
+            Vector3 deltaEstimate = -0.5f * springStiffness * (bodyToBodyDistance - restLength) * bodyToBodyVector.normalized;
             if (i > 0)
             {
-                Vector3 deltaEstimate1 = -0.5f * springStiffness * (bodyToBodyDistance - restLength) * bodyToBodyVector.normalized;
-                estimatedPositions[i - 1] += deltaEstimate1;
+                estimatedPositions[i - 1] += deltaEstimate;
             }
             if (i < amountOfBodies)
             {
-                Vector3 deltaEstimate2 = 0.5f * springStiffness * (bodyToBodyDistance - restLength) * bodyToBodyVector.normalized;
-                estimatedPositions[i] += deltaEstimate2;
+                estimatedPositions[i] += -deltaEstimate;
             }
         }
 

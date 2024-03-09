@@ -688,16 +688,18 @@ MonoBehaviour:
     type: 3}
   springPrefab: {fileID: 7832927782961393496, guid: 011e85f65811d5a48adbda131f387bad,
     type: 3}
-  amountOfBodies: 40
+  amountOfBodies: 50
   startPoint: {fileID: 884916067}
   endPoint: {fileID: 193503167}
   dynamicsType: 1
-  gravitionalAcceleration: 0
-  yDrivingAmplitude: 10
-  yDrivingAngularFrequency: 6
-  dampingFactor: 1
-  omegaSquared: 100
-  springStiffness: 1
+  gravitionalAcceleration: 9.81
+  yDrivingAmplitude: 1000
+  yDrivingAngularFrequency: 18.84956
+  omegaSquared: 5000
+  gamma: 0
+  integrator: 0
+  springStiffness: 0.5
+  dampingFactor: 0.995
 --- !u!4 &1782055151
 Transform:
   m_ObjectHideFlags: 0

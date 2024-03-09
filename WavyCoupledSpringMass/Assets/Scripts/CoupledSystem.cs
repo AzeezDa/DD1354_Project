@@ -1,3 +1,5 @@
+using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -50,6 +52,8 @@ public class CoupledSystem : MonoBehaviour
     [SerializeField]
     [Min(0)]
     float gamma = 1f;
+    [SerializeField]
+    Integrator integrator;
 
     [Header("PBD Specific Parameters")]
     [SerializeField]
@@ -68,6 +72,13 @@ public class CoupledSystem : MonoBehaviour
     ForceBasedDynamics forceBasedDynamics;
     PositionBasedDynamics positionBasedDynamics;
 
+    [SerializeField]
+
+    StreamWriter record;
+    Body first;
+    Body mid;
+    Body last;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -84,7 +95,7 @@ public class CoupledSystem : MonoBehaviour
 
         // Divide the entire span. The restlength is the size of each division
         float offset = vectorAlongSystem.magnitude / (amountOfBodies + 1);
-        float restLengthFactor = 0.5f; // Lower value means more tension 
+        float restLengthFactor = 0.3f; // Lower value means more tension 
         restLength = restLengthFactor * offset;
 
         // Add bodies with given offset
@@ -113,7 +124,8 @@ public class CoupledSystem : MonoBehaviour
             yDrivingAmplitude,
             yDrivingAngularFrequency,
             restLength,
-            bodies);
+            bodies,
+            integrator);
 
         positionBasedDynamics = new PositionBasedDynamics(
             bodies,
@@ -124,22 +136,80 @@ public class CoupledSystem : MonoBehaviour
             gravitionalAcceleration,
             yDrivingAmplitude,
             yDrivingAngularFrequency);
-    }
 
-    void FixedUpdate()
-    {
+        StringBuilder fileName = new($"Records/{yDrivingAmplitude}_{yDrivingAngularFrequency}_{gravitionalAcceleration}");
         if (dynamicsType == DynamicsType.ForceBasedDynamics)
         {
-            forceBasedDynamics.UpdateParameters(gravitionalAcceleration, omegaSquared, gamma, yDrivingAmplitude, yDrivingAngularFrequency);
-            forceBasedDynamics.Step();
-
+            fileName.Append($"_fbd_{omegaSquared}_{gamma}");
         }
         else if (dynamicsType == DynamicsType.PositionBasedDynamics)
         {
+            fileName.Append($"_pbd_{springStiffness}_{dampingFactor}");
+        }
+        fileName.Append(".csv");
 
-            positionBasedDynamics.UpdateParameters(gravitionalAcceleration, springStiffness, dampingFactor, yDrivingAmplitude, yDrivingAngularFrequency);
+        record = new StreamWriter(fileName.ToString());
+        record.WriteLine("time,y1,ymid,yn");
+
+        first = bodies[1];
+        mid = bodies[amountOfBodies % 2 == 0 ? amountOfBodies / 2 : amountOfBodies / 2 + 1];
+        last = bodies[amountOfBodies];
+    }
+
+    double average = 0;
+    double total = 0;
+    int iterations = 0;
+    void FixedUpdate()
+    {
+        double timeStart = Time.realtimeSinceStartup;
+        if (dynamicsType == DynamicsType.ForceBasedDynamics)
+        {
+            forceBasedDynamics.Step();
+        }
+        else if (dynamicsType == DynamicsType.PositionBasedDynamics)
+        {
             positionBasedDynamics.Step();
         }
+        total += Time.realtimeSinceStartup - timeStart;
+        iterations += 1;
+        average = total / iterations;
+        if (iterations <= 2000)
+        {
+            record.WriteLine($"{Time.fixedTime},{first.Position.y},{mid.Position.y},{last.Position.y}");
+        }
+        else if (iterations == 2001)
+        {
+            record.Flush();
+            record.Close();
+        }
+
+        if (iterations % 2000 == 0)
+        {
+            Debug.Log(average);
+        }
+    }
+
+    void OnValidate()
+    {
+        positionBasedDynamics?.UpdateParameters(
+            gravitionalAcceleration,
+            springStiffness,
+            dampingFactor,
+            yDrivingAmplitude,
+            yDrivingAngularFrequency);
+
+        forceBasedDynamics?.UpdateParameters(
+            gravitionalAcceleration,
+            omegaSquared,
+            gamma,
+            yDrivingAmplitude,
+            yDrivingAngularFrequency,
+            integrator);
+    }
+
+    void OnDestroy()
+    {
+        record?.Close();
     }
 
 }

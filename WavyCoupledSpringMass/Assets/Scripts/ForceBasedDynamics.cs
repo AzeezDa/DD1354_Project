@@ -1,7 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.Assertions;
+
+public enum Integrator
+{
+    RungeKutta4,
+    EulerForward
+}
 
 public class ForceBasedDynamics
 {
@@ -13,6 +21,8 @@ public class ForceBasedDynamics
     float yDrivingAngularFrequency;
     readonly float restLength;
     readonly Body[] bodies;
+    readonly Vector3[] deltaPositions;
+    Integrator integrator;
 
     public ForceBasedDynamics(
         int amountOfBodies,
@@ -22,7 +32,8 @@ public class ForceBasedDynamics
         float yDrivingAmplitude,
         float yDrivingAngularFrequency,
         float restLength,
-        Body[] bodies)
+        Body[] bodies,
+        Integrator integrator)
     {
 
         this.amountOfBodies = amountOfBodies;
@@ -33,42 +44,41 @@ public class ForceBasedDynamics
         this.yDrivingAngularFrequency = yDrivingAngularFrequency;
         this.restLength = restLength;
         this.bodies = bodies;
+        this.integrator = integrator;
+        deltaPositions = new Vector3[amountOfBodies];
     }
 
     public void Step()
     {
-        float dt = Time.fixedDeltaTime;
-        float halfdt = 0.5f * dt; // Used for Runge-Kutta 4
-
         for (int i = 1; i < amountOfBodies + 1; i++)
         {
             Body body = bodies[i];
 
-            // Runge-Kutta 4
-            Vector3 v1 = body.Velocity;
-            Vector3 a1 = GetAccelerationFor(i, 0, body.Position, v1);
+            Vector3 deltaPosition = Vector3.zero;
+            Vector3 deltaVelocity = Vector3.zero;
 
-            Vector3 v2 = v1 + halfdt * a1;
-            Vector3 a2 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v1, v1);
+            switch (integrator)
+            {
+                case Integrator.EulerForward:
+                    EulerForwardStep(i, out deltaPosition, out deltaVelocity);
+                    break;
+                case Integrator.RungeKutta4:
+                    RK4Step(i, out deltaPosition, out deltaVelocity);
+                    break;
+            }
 
-            Vector3 v3 = v2 + halfdt * a2;
-            Vector3 a3 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v2, v2);
+            deltaPositions[i-1] = deltaPosition;
+            body.Velocity += deltaVelocity;
+        }
 
-            Vector3 v4 = v3 + halfdt * a3;
-            Vector3 a4 = GetAccelerationFor(i, dt, body.Position + dt * v3, v3);
-
-            Vector3 velocity = (v1 + v2 + v2 + v3 + v3 + v4) / 6f;
-            Vector3 acceleration = (a1 + a2 + a2 + a3 + a3 + a4) / 6f;
-
-            body.Position += velocity * dt;
-            body.Velocity += acceleration * dt;
+        for (int i = 1; i < amountOfBodies + 1; i++)
+        {
+            bodies[i].Position += deltaPositions[i - 1];
         }
     }
 
     Vector3 GetAccelerationFor(int i, float dt, Vector3 position, Vector3 velocity)
     {
-        Assert.IsTrue(0 < i && i < amountOfBodies + 1);
-
         // Start with only gravitional force
         Vector3 acceleration = Vector3.down * gravitionalAcceleration;
 
@@ -101,12 +111,47 @@ public class ForceBasedDynamics
         float omegaSquared,
         float dampingFactor,
         float yDrivingAmplitude,
-        float yDrivingAngularFrequency)
+        float yDrivingAngularFrequency,
+        Integrator integrator)
     {
         this.gravitionalAcceleration = gravitionalAcceleration;
         this.omegaSquared = omegaSquared;
         this.dampingFactor = dampingFactor;
         this.yDrivingAmplitude = yDrivingAmplitude;
         this.yDrivingAngularFrequency = yDrivingAngularFrequency;
+        this.integrator = integrator;
+    }
+
+    void RK4Step(int i, out Vector3 deltaPosition, out Vector3 deltaVelocity)
+    {
+        Body body = bodies[i];
+
+        float dt = Time.fixedDeltaTime;
+        float halfdt = 0.5f * dt; // Used for Runge-Kutta 4
+
+        Vector3 v1 = body.Velocity;
+        Vector3 a1 = GetAccelerationFor(i, 0, body.Position, v1);
+
+        Vector3 v2 = v1 + halfdt * a1;
+        Vector3 a2 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v1, v2);
+
+        Vector3 v3 = v2 + halfdt * a2;
+        Vector3 a3 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v2, v3);
+
+        Vector3 v4 = v3 + dt * a3;
+        Vector3 a4 = GetAccelerationFor(i, dt, body.Position + dt * v3, v4);
+
+        deltaPosition = dt / 6f * (v1 + v2 + v2 + v3 + v3 + v4);
+        deltaVelocity = dt / 6f * (a1 + a2 + a2 + a3 + a3 + a4);
+    }
+
+    void EulerForwardStep(int i, out Vector3 deltaPosition, out Vector3 deltaVelocity)
+    {
+        float dt = Time.fixedDeltaTime;
+
+        Body body = bodies[i];
+
+        deltaPosition = dt * body.Velocity;
+        deltaVelocity = dt * GetAccelerationFor(i, dt, body.Position, body.Velocity);
     }
 }

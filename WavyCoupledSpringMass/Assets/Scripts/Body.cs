@@ -10,7 +10,6 @@ public class Body : MonoBehaviour
 
     public Vector3 Velocity { get; set; }
     public Vector3 Position { get; set; }
-    public Vector3 Acceleration { get; set; }
 
     void FixedUpdate() {
         transform.position = Position;
