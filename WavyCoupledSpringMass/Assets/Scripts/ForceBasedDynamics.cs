@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public enum Integrator
 {
@@ -67,7 +62,7 @@ public class ForceBasedDynamics
                     break;
             }
 
-            deltaPositions[i-1] = deltaPosition;
+            deltaPositions[i - 1] = deltaPosition;
             body.Velocity += deltaVelocity;
         }
 
@@ -93,7 +88,7 @@ public class ForceBasedDynamics
         acceleration += omegaSquared * extensionLeft * deltaToLeft.normalized;
         acceleration += omegaSquared * extensionRight * deltaToRight.normalized;
 
-        // Drag Force
+        // Damping Force
         acceleration += -dampingFactor * velocity;
 
         // Driving Force (Only on the first body)

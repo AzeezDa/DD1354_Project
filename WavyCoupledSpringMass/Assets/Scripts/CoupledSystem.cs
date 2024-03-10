@@ -1,7 +1,6 @@
 using System.IO;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 enum DynamicsType
 {
@@ -30,6 +29,7 @@ public class CoupledSystem : MonoBehaviour
 
     [SerializeField]
     DynamicsType dynamicsType = DynamicsType.ForceBasedDynamics;
+    DynamicsType oldDynamicsType = DynamicsType.ForceBasedDynamics; // Used for switch handling at runtime
 
     [Header("General Physical Properties")]
     [SerializeField]
@@ -42,7 +42,6 @@ public class CoupledSystem : MonoBehaviour
     [SerializeField]
     [Min(0)]
     float yDrivingAngularFrequency = 0f;
-
 
     [Header("FBD Specific Parameters")]
     [SerializeField]
@@ -64,7 +63,6 @@ public class CoupledSystem : MonoBehaviour
     [Range(0, 1)]
     float dampingFactor = 1f;
 
-
     float restLength;
     Body[] bodies;
     Spring[] springs;
@@ -72,14 +70,17 @@ public class CoupledSystem : MonoBehaviour
     ForceBasedDynamics forceBasedDynamics;
     PositionBasedDynamics positionBasedDynamics;
 
-    [SerializeField]
-
-    StreamWriter record;
+    StreamWriter recordStreamWriter = null;
     Body first;
     Body mid;
     Body last;
 
-    // Start is called before the first frame update
+    double averageTimePerStep = 0;
+    double totalTimePerStep = 0;
+    int iterations = 0;
+    const int RECORD_ITERATIONS_MAX = 2000;
+
+
     void Start()
     {
         // Set up bodies and strings
@@ -137,28 +138,10 @@ public class CoupledSystem : MonoBehaviour
             yDrivingAmplitude,
             yDrivingAngularFrequency);
 
-        StringBuilder fileName = new($"Records/{yDrivingAmplitude}_{yDrivingAngularFrequency}_{gravitionalAcceleration}");
-        if (dynamicsType == DynamicsType.ForceBasedDynamics)
-        {
-            fileName.Append($"_fbd_{omegaSquared}_{gamma}");
-        }
-        else if (dynamicsType == DynamicsType.PositionBasedDynamics)
-        {
-            fileName.Append($"_pbd_{springStiffness}_{dampingFactor}");
-        }
-        fileName.Append(".csv");
-
-        record = new StreamWriter(fileName.ToString());
-        record.WriteLine("time,y1,ymid,yn");
-
-        first = bodies[1];
-        mid = bodies[amountOfBodies % 2 == 0 ? amountOfBodies / 2 : amountOfBodies / 2 + 1];
-        last = bodies[amountOfBodies];
+        StartRecorder();
+        oldDynamicsType = dynamicsType;
     }
 
-    double average = 0;
-    double total = 0;
-    int iterations = 0;
     void FixedUpdate()
     {
         double timeStart = Time.realtimeSinceStartup;
@@ -170,22 +153,32 @@ public class CoupledSystem : MonoBehaviour
         {
             positionBasedDynamics.Step();
         }
-        total += Time.realtimeSinceStartup - timeStart;
+
+
+        // Timekeeping
+        totalTimePerStep += Time.realtimeSinceStartup - timeStart;
         iterations += 1;
-        average = total / iterations;
-        if (iterations <= 2000)
+        averageTimePerStep = totalTimePerStep / iterations;
+        if (iterations % RECORD_ITERATIONS_MAX == 0)
         {
-            record.WriteLine($"{Time.fixedTime},{first.Position.y},{mid.Position.y},{last.Position.y}");
-        }
-        else if (iterations == 2001)
-        {
-            record.Flush();
-            record.Close();
+            Debug.Log($"Average Step Time-Cost: {averageTimePerStep * 1000}ms");
         }
 
-        if (iterations % 2000 == 0)
+        // Recording
+        if (recordStreamWriter == null)
         {
-            Debug.Log(average);
+            return;
+        }
+
+        if (iterations <= RECORD_ITERATIONS_MAX)
+        {
+            recordStreamWriter.WriteLine($"{Time.fixedTime},{first.Position.y},{mid.Position.y},{last.Position.y}");
+        }
+        else if (iterations == RECORD_ITERATIONS_MAX + 1)
+        {
+            recordStreamWriter.Flush();
+            recordStreamWriter.Close();
+            recordStreamWriter = null;
         }
     }
 
@@ -205,11 +198,42 @@ public class CoupledSystem : MonoBehaviour
             yDrivingAmplitude,
             yDrivingAngularFrequency,
             integrator);
+
+        if (oldDynamicsType != dynamicsType)
+        {
+            Debug.Log("Dynamics Type Switched. Counters and timers resetted!");
+            iterations = 0;
+            totalTimePerStep = 0;
+            averageTimePerStep = 0;
+            recordStreamWriter?.Close();
+            oldDynamicsType = dynamicsType;
+        }
+    }
+
+    void StartRecorder()
+    {
+        StringBuilder fileName = new($"Records/{yDrivingAmplitude}_{yDrivingAngularFrequency}_{gravitionalAcceleration}");
+        if (dynamicsType == DynamicsType.ForceBasedDynamics)
+        {
+            fileName.Append($"_fbd_{omegaSquared}_{gamma}");
+        }
+        else if (dynamicsType == DynamicsType.PositionBasedDynamics)
+        {
+            fileName.Append($"_pbd_{springStiffness}_{dampingFactor}");
+        }
+        fileName.Append(".csv");
+
+        recordStreamWriter = new StreamWriter(fileName.ToString());
+        recordStreamWriter.WriteLine("time,y1,ymid,yn");
+
+        first = bodies[1];
+        mid = bodies[amountOfBodies % 2 == 0 ? amountOfBodies / 2 : amountOfBodies / 2 + 1];
+        last = bodies[amountOfBodies];
+
     }
 
     void OnDestroy()
     {
-        record?.Close();
+        recordStreamWriter?.Close();
     }
-
 }

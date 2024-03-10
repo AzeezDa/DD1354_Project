@@ -691,14 +691,14 @@ MonoBehaviour:
   amountOfBodies: 50
   startPoint: {fileID: 884916067}
   endPoint: {fileID: 193503167}
-  dynamicsType: 1
-  gravitionalAcceleration: 9.81
-  yDrivingAmplitude: 1000
+  dynamicsType: 0
+  gravitionalAcceleration: 0
+  yDrivingAmplitude: 100
   yDrivingAngularFrequency: 18.84956
-  omegaSquared: 5000
+  omegaSquared: 500
   gamma: 0
   integrator: 0
-  springStiffness: 0.5
+  springStiffness: 0.02
   dampingFactor: 0.995
 --- !u!4 &1782055151
 Transform:

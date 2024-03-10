@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public class PositionBasedDynamics
 {
@@ -84,7 +81,6 @@ public class PositionBasedDynamics
 
     Vector3 GetAccelerationFor(int i)
     {
-        Assert.IsTrue(0 < i && i < amountOfBodies + 1);
         Vector3 acceleration = gravitionalAcceleration * Vector3.down;
 
         // Driving Force (Only on the first body)
