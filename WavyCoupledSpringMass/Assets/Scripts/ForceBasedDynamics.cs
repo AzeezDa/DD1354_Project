@@ -9,7 +9,7 @@ public enum Integrator
 public class ForceBasedDynamics
 {
     readonly int amountOfBodies;
-    float gravitionalAcceleration;
+    float gravitationalAcceleration;
     float omegaSquared;
     float dampingFactor;
     float yDrivingAmplitude;
@@ -21,7 +21,7 @@ public class ForceBasedDynamics
 
     public ForceBasedDynamics(
         int amountOfBodies,
-        float gravitionalAcceleration,
+        float gravitationalAcceleration,
         float omegaSquared,
         float dampingFactor,
         float yDrivingAmplitude,
@@ -32,7 +32,7 @@ public class ForceBasedDynamics
     {
 
         this.amountOfBodies = amountOfBodies;
-        this.gravitionalAcceleration = gravitionalAcceleration;
+        this.gravitationalAcceleration = gravitationalAcceleration;
         this.omegaSquared = omegaSquared;
         this.dampingFactor = dampingFactor;
         this.yDrivingAmplitude = yDrivingAmplitude;
@@ -72,10 +72,10 @@ public class ForceBasedDynamics
         }
     }
 
-    Vector3 GetAccelerationFor(int i, float dt, Vector3 position, Vector3 velocity)
+    Vector3 GetAccelerationOnBody(int i, float dt, Vector3 position, Vector3 velocity)
     {
-        // Start with only gravitional force
-        Vector3 acceleration = Vector3.down * gravitionalAcceleration;
+        // Start with only gravitational force
+        Vector3 acceleration = Vector3.down * gravitationalAcceleration;
 
         Body left = bodies[i - 1];
         Body right = bodies[i + 1];
@@ -102,14 +102,14 @@ public class ForceBasedDynamics
     }
 
     public void UpdateParameters(
-        float gravitionalAcceleration,
+        float gravitationalAcceleration,
         float omegaSquared,
         float dampingFactor,
         float yDrivingAmplitude,
         float yDrivingAngularFrequency,
         Integrator integrator)
     {
-        this.gravitionalAcceleration = gravitionalAcceleration;
+        this.gravitationalAcceleration = gravitationalAcceleration;
         this.omegaSquared = omegaSquared;
         this.dampingFactor = dampingFactor;
         this.yDrivingAmplitude = yDrivingAmplitude;
@@ -125,16 +125,16 @@ public class ForceBasedDynamics
         float halfdt = 0.5f * dt; // Used for Runge-Kutta 4
 
         Vector3 v1 = body.Velocity;
-        Vector3 a1 = GetAccelerationFor(i, 0, body.Position, v1);
+        Vector3 a1 = GetAccelerationOnBody(i, 0, body.Position, v1);
 
         Vector3 v2 = v1 + halfdt * a1;
-        Vector3 a2 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v1, v2);
+        Vector3 a2 = GetAccelerationOnBody(i, halfdt, body.Position + halfdt * v1, v2);
 
         Vector3 v3 = v2 + halfdt * a2;
-        Vector3 a3 = GetAccelerationFor(i, halfdt, body.Position + halfdt * v2, v3);
+        Vector3 a3 = GetAccelerationOnBody(i, halfdt, body.Position + halfdt * v2, v3);
 
         Vector3 v4 = v3 + dt * a3;
-        Vector3 a4 = GetAccelerationFor(i, dt, body.Position + dt * v3, v4);
+        Vector3 a4 = GetAccelerationOnBody(i, dt, body.Position + dt * v3, v4);
 
         deltaPosition = dt / 6f * (v1 + v2 + v2 + v3 + v3 + v4);
         deltaVelocity = dt / 6f * (a1 + a2 + a2 + a3 + a3 + a4);
@@ -147,6 +147,6 @@ public class ForceBasedDynamics
         Body body = bodies[i];
 
         deltaPosition = dt * body.Velocity;
-        deltaVelocity = dt * GetAccelerationFor(i, dt, body.Position, body.Velocity);
+        deltaVelocity = dt * GetAccelerationOnBody(i, dt, body.Position, body.Velocity);
     }
 }

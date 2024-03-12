@@ -692,10 +692,10 @@ MonoBehaviour:
   startPoint: {fileID: 884916067}
   endPoint: {fileID: 193503167}
   dynamicsType: 0
-  gravitionalAcceleration: 0
-  yDrivingAmplitude: 100
+  gravitationalAcceleration: 0
+  yDrivingAmplitude: 50
   yDrivingAngularFrequency: 18.84956
-  omegaSquared: 500
+  omegaSquared: 250
   gamma: 0
   integrator: 0
   springStiffness: 0.02

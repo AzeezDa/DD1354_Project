@@ -33,7 +33,7 @@ public class CoupledSystem : MonoBehaviour
 
     [Header("General Physical Properties")]
     [SerializeField]
-    float gravitionalAcceleration = 9.81f;
+    float gravitationalAcceleration = 9.81f;
 
     [SerializeField]
     [Min(0)]
@@ -119,7 +119,7 @@ public class CoupledSystem : MonoBehaviour
 
         forceBasedDynamics = new ForceBasedDynamics(
             amountOfBodies,
-            gravitionalAcceleration,
+            gravitationalAcceleration,
             omegaSquared,
             gamma,
             yDrivingAmplitude,
@@ -134,7 +134,7 @@ public class CoupledSystem : MonoBehaviour
             springStiffness,
             restLength,
             dampingFactor,
-            gravitionalAcceleration,
+            gravitationalAcceleration,
             yDrivingAmplitude,
             yDrivingAngularFrequency);
 
@@ -185,14 +185,14 @@ public class CoupledSystem : MonoBehaviour
     void OnValidate()
     {
         positionBasedDynamics?.UpdateParameters(
-            gravitionalAcceleration,
+            gravitationalAcceleration,
             springStiffness,
             dampingFactor,
             yDrivingAmplitude,
             yDrivingAngularFrequency);
 
         forceBasedDynamics?.UpdateParameters(
-            gravitionalAcceleration,
+            gravitationalAcceleration,
             omegaSquared,
             gamma,
             yDrivingAmplitude,
@@ -212,7 +212,7 @@ public class CoupledSystem : MonoBehaviour
 
     void StartRecorder()
     {
-        StringBuilder fileName = new($"Records/{yDrivingAmplitude}_{yDrivingAngularFrequency}_{gravitionalAcceleration}");
+        StringBuilder fileName = new($"Records/{yDrivingAmplitude}_{yDrivingAngularFrequency}_{gravitationalAcceleration}");
         if (dynamicsType == DynamicsType.ForceBasedDynamics)
         {
             fileName.Append($"_fbd_{omegaSquared}_{gamma}");

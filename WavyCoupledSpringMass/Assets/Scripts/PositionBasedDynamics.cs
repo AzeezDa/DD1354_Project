@@ -8,7 +8,7 @@ public class PositionBasedDynamics
     float springStiffness;
     readonly float restLength;
     float dampingFactor;
-    float gravitionalAcceleration;
+    float gravitationalAcceleration;
     float yDrivingAmplitude;
     float yDrivingAngularFrequency;
 
@@ -18,7 +18,7 @@ public class PositionBasedDynamics
         float springStiffness,
         float restLength,
         float dampingFactor,
-        float gravitionalAcceleration,
+        float gravitationalAcceleration,
         float yDrivingAmplitude,
         float yDrivingAngularFrequency
     )
@@ -28,7 +28,7 @@ public class PositionBasedDynamics
         this.springStiffness = springStiffness;
         this.restLength = restLength;
         this.dampingFactor = dampingFactor;
-        this.gravitionalAcceleration = gravitionalAcceleration;
+        this.gravitationalAcceleration = gravitationalAcceleration;
         this.yDrivingAmplitude = yDrivingAmplitude;
         this.yDrivingAngularFrequency = yDrivingAngularFrequency;
 
@@ -76,12 +76,11 @@ public class PositionBasedDynamics
             body.Velocity = (estimatedPositions[i - 1] - body.Position) / dt;
             body.Position = estimatedPositions[i - 1];
         }
-
     }
 
     Vector3 GetAccelerationFor(int i)
     {
-        Vector3 acceleration = gravitionalAcceleration * Vector3.down;
+        Vector3 acceleration = gravitationalAcceleration * Vector3.down;
 
         // Driving Force (Only on the first body)
         if (i == 1)
@@ -94,14 +93,14 @@ public class PositionBasedDynamics
     }
 
     public void UpdateParameters(
-        float gravitionalAcceleration,
+        float gravitationalAcceleration,
         float springStiffness,
         float dampingFactor,
         float yDrivingAmplitude,
         float yDrivingAngularFrequency
     )
     {
-        this.gravitionalAcceleration = gravitionalAcceleration;
+        this.gravitationalAcceleration = gravitationalAcceleration;
         this.springStiffness = springStiffness;
         this.dampingFactor = dampingFactor;
         this.yDrivingAmplitude = yDrivingAmplitude;
